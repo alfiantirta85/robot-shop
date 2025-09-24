@@ -73,6 +73,11 @@ services:
     build:
       context: mysql
     image: ${REPO}/rs-mysql-db:${TAG}
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+      MYSQL_DATABASE: cities
+      MYSQL_USER: shipping
+      MYSQL_PASSWORD: secret
     cap_add:
       - NET_ADMIN
     networks:
@@ -142,9 +147,6 @@ services:
   web:
     build:
       context: web
-      args:
-        # agent key to download tracing libs
-        KEY: ${INSTANA_AGENT_KEY}
     image: ${REPO}/rs-web:${TAG}
     depends_on:
       - catalogue

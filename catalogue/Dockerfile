@@ -1,10 +1,12 @@
-FROM node:14
+FROM node:14-alpine
 
-ENV INSTANA_AUTO_PROFILE true
+ENV INSTANA_AUTO_PROFILE=true
 
 EXPOSE 8080
 
 WORKDIR /opt/server
+
+RUN apk add --update curl && rm -rf /var/cache/apk/*
 
 COPY package.json /opt/server/
 
