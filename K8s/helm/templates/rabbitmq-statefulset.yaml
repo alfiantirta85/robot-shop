@@ -1,7 +1,8 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: rabbitmq
+  namespace: {{ .Values.namespace }}
   labels:
     service: rabbitmq
 spec:
@@ -9,6 +10,7 @@ spec:
   selector:
     matchLabels:
       service: rabbitmq
+  serviceName: rabbitmq
   template:
     metadata:
       labels:
@@ -19,11 +21,14 @@ spec:
       {{ end }}
       containers:
       - name: rabbitmq
-        image: alfian8/rabbitmq:3.8-management-alpine
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: {{ .Values.image.repository }}/rabbitmq:{{ .Values.image.rabbitmqTag }}
+        imagePullPolicy: Always
         ports:
         - containerPort: 5672
         - containerPort: 15672
+        volumeMounts:
+          - name: rabbitmq-persistent-storage
+            mountPath: /var/lib/rabbitmq
         resources:
           limits:
             cpu: 200m
@@ -32,15 +37,9 @@ spec:
             cpu: 100m
             memory: 256Mi
       restartPolicy: Always
-      {{- with .Values.rabbitmq.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.rabbitmq.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.rabbitmq.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      imagePullSecrets:
+      - name: {{ .Values.image.imagePullSecrets }}
+      volumes:
+      - name: rabbitmq-persistent-storage
+        persistentVolumeClaim:
+          claimName: rabbitmq-pv-claim

@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dispatch
+  namespace: {{ .Values.namespace }}
   labels:
     service: dispatch
 spec:
@@ -19,8 +20,8 @@ spec:
       {{ end }}
       containers:
       - name: dispatch
-        image: {{ .Values.image.repo }}/rs-dispatch:{{ .Values.image.version }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: {{ .Values.image.repository }}/rs-dispatch:{{ .Values.image.dispatchTag }}
+        imagePullPolicy: Always
         env:
           # agent networking access
           - name: INSTANA_AGENT_HOST
@@ -35,15 +36,5 @@ spec:
             cpu: 100m
             memory: 50Mi
       restartPolicy: Always
-      {{- with .Values.dispatch.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.dispatch.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.dispatch.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      imagePullSecrets:
+      - name: {{ .Values.image.imagePullSecrets }}

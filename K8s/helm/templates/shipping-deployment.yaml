@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: shipping
+  namespace: {{ .Values.namespace }}
   labels:
     service: shipping
 spec:
@@ -19,8 +20,8 @@ spec:
       {{ end }}
       containers:
       - name: shipping
-        image: {{ .Values.image.repo }}/rs-shipping:{{ .Values.image.version }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: {{ .Values.image.repository }}/rs-shipping:{{ .Values.image.shippingTag }}
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         # it's Java it needs lots of memory
@@ -40,15 +41,5 @@ spec:
           failureThreshold: 30
           successThreshold: 1
       restartPolicy: Always
-      {{- with .Values.shipping.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.shipping.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.shipping.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      imagePullSecrets:
+      - name: {{ .Values.image.imagePullSecrets }}

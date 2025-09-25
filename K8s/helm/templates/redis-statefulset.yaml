@@ -4,6 +4,7 @@ metadata:
   labels:
     service: redis
   name: redis
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
@@ -20,13 +21,13 @@ spec:
       {{ end }}
       containers:
       - name: redis
-        image: alfian8/redis:6.2-alpine
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: {{ .Values.image.repository }}/redis:{{ .Values.image.redisTag }}
+        imagePullPolicy: Always
         ports:
         - containerPort: 6379
-#        volumeMounts:
-#          - name: data
-#            mountPath: /mnt/redis
+        volumeMounts:
+          - name: redis-persistent-storage
+            mountPath: /var/lib/redis
         resources:
           limits:
             cpu: 200m
@@ -35,28 +36,9 @@ spec:
             cpu: 100m
             memory: 50Mi
       restartPolicy: Always
-      {{- with .Values.redis.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.redis.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.redis.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-#  volumeClaimTemplates:
-#    - metadata:
-#        name: data
-#      spec:
-#        accessModes: [ "ReadWriteOnce" ]
-#        {{ if not .Values.openshift }}
-#        storageClassName: {{ .Values.redis.storageClassName }}
-#        volumeMode: Filesystem
-#        {{ end }}
-#        resources:
-#          requests:
-#            storage: 1Gi
-
+      imagePullSecrets:
+      - name: {{ .Values.image.imagePullSecrets }}
+      volumes:
+      - name: redis-persistent-storage
+        persistentVolumeClaim:
+          claimName: redis-pv-claim

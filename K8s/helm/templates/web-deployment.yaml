@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: web
+  namespace: {{ .Values.namespace }}
   labels:
     service: web
 spec:
@@ -19,8 +20,8 @@ spec:
       {{ end }}
       containers:
       - name: web
-        image: {{ .Values.image.repo }}/rs-web:{{ .Values.image.version }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: {{ .Values.image.repository }}/rs-web:{{ .Values.image.webTag }}
+        imagePullPolicy: Always
         {{- if .Values.eum.key }}
         env:
         - name: INSTANA_EUM_KEY
@@ -38,15 +39,5 @@ spec:
             cpu: 100m
             memory: 50Mi
       restartPolicy: Always
-      {{- with .Values.web.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.web.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.web.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      imagePullSecrets:
+      - name: {{ .Values.image.imagePullSecrets }}

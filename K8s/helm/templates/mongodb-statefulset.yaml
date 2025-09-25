@@ -1,7 +1,8 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: mongodb
+  namespace: {{ .Values.namespace }}
   labels:
     service: mongodb
 spec:
@@ -9,6 +10,7 @@ spec:
   selector:
     matchLabels:
       service: mongodb
+  serviceName: mongodb
   template:
     metadata:
       labels:
@@ -19,10 +21,13 @@ spec:
       {{ end }}
       containers:
       - name: mongodb
-        image: {{ .Values.image.repo }}/rs-mongodb:{{ .Values.image.version }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: {{ .Values.image.repository }}/rs-mongodb:{{ .Values.image.mongodbTag }}
+        imagePullPolicy: Always
         ports:
         - containerPort: 27017
+        volumeMounts:
+          - name: mongodb-persistent-storage
+            mountPath: /data/db
         resources:
           limits:
             cpu: 200m
@@ -31,15 +36,9 @@ spec:
             cpu: 100m
             memory: 100Mi
       restartPolicy: Always
-      {{- with .Values.mongodb.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.mongodb.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.mongodb.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      imagePullSecrets:
+      - name: {{ .Values.image.imagePullSecrets }}
+      volumes:
+      - name: mongodb-persistent-storage
+        persistentVolumeClaim:
+          claimName: mongodb-pv-claim

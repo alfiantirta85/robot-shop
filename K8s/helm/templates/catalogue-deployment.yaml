@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: catalogue
+  namespace: {{ .Values.namespace }}
   labels:
     service: catalogue
 spec:
@@ -19,8 +20,8 @@ spec:
       {{ end }}
       containers:
       - name: catalogue
-        image: {{ .Values.image.repo }}/rs-catalogue:{{ .Values.image.version }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: {{ .Values.image.repository }}/rs-catalogue:{{ .Values.image.catalogueTag }}
+        imagePullPolicy: Always
         env:
           - name: INSTANA_AGENT_HOST
             valueFrom:
@@ -36,15 +37,5 @@ spec:
             cpu: 100m
             memory: 50Mi
       restartPolicy: Always
-      {{- with .Values.catalogue.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.catalogue.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.catalogue.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      imagePullSecrets:
+      - name: {{ .Values.image.imagePullSecrets }}

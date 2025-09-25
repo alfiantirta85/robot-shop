@@ -1,64 +1,45 @@
+# Namespace
+namespace: robot-shop
+
+# Ingress web
+ingress:
+  host: robot-shop.at.lab
+
 # Registry and repository for Docker images
-# Default is docker/robotshop/image:latest
 image:
-  repo: alfian8
-  version: latest
-  pullPolicy: IfNotPresent
+  imagePullSecrets: robot-shop-image-secrets
+  repository: alfian8
+  cartTag: latest
+  catalogueTag: latest
+  dispatchTag: latest
+  mongodbTag: latest
+  mysqlTag: latest
+  paymentTag: latest
+  rabbitmqTag: 3.8-management-alpine
+  ratingsTag: latest
+  redisTag: 6.2-alpine
+  shippingTag: latest
+  userTag: latest
+  webTag: latest
 
 # EUM configuration
 # Provide your key and set the endpoint
 eum:
   key: null
   url: https://eum-eu-west-1.instana.io
-  #url: https://eum-us-west-2.instana.io
 
 # Pod Security Policy
 psp:
   enabled: false
 
-# For the mini ones minikube, minishift set to true
+payment:
+    # Alternative payment gateway URL
+    # Default is https://www.paypal.com
+    gateway: null
+
+# NodePort for web service
 nodeport: true
 
-# "special" Openshift. Set to true when deploying to any openshift flavour
-openshift: false
-
-ocCreateRoute: false
-
-######################################
-# Affinities for individual workloads
-# set in the following way:
-# <workload>:
-#   affinity: {}
-#   nodeSelector: {}
-#   tolerations: []
-######################################
-
-cart: {}
-
-catalogue: {}
-
-dispatch: {}
-
-mongodb: {}
-
-mysql: {}
-
-payment:
-  # Alternative payment gateway URL
-  # Default is https://www.paypal.com
-  gateway: null
-  #gateway: https://www.worldpay.com
-
-rabbitmq: {}
-
-ratings: {}
-
-redis:
-  # Storage class to use with redis statefulset.
-  storageClassName: standard
-
-shipping: {}
-
-user: {}
-
-web: {}
+persistentStorage:
+  storageClass: nfs-dev-provisioner
+  requests: 3Gi

@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cart
+  namespace: {{ .Values.namespace }}
   labels:
     service: cart
 spec:
@@ -19,8 +20,8 @@ spec:
       {{ end }}
       containers:
       - name: cart
-        image: {{ .Values.image.repo }}/rs-cart:{{ .Values.image.version }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: {{ .Values.image.repository }}/rs-cart:{{ .Values.image.cartTag }}
+        imagePullPolicy: Always
         # agent networking access
         env:
           - name: INSTANA_AGENT_HOST
@@ -36,15 +37,6 @@ spec:
           requests:
             cpu: 100m
             memory: 50Mi
-      {{- with .Values.cart.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.cart.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.cart.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      restartPolicy: Always
+      imagePullSecrets:
+      - name: {{ .Values.image.imagePullSecrets }}

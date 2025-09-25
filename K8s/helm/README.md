@@ -13,6 +13,10 @@ $ helm install --name robot-shop --namespace robot-shop .
 ```bash
 $ kubectl create ns robot-shop
 $ kubectl create secret generic mysql-secret --from-env-file=.env -n robot-shop
+$ kubectl -n robot-shop create secret docker-registry robot-shop-image-secrets \
+    --docker-server=index.docker.io/v1/ \
+    --docker-username=<USERNAME DOCKERHUB> \
+    --docker-password=<PAT USER DOCKERHUB>
 $ helm install robot-shop --namespace robot-shop .
 ```
 
