@@ -9,4 +9,4 @@ spec:
   storageClassName: {{ .Values.persistentStorage.storageClass }}
   resources:
     requests:
-      storage: {{ .Values.persistentStorage.requests }
+      storage: {{ .Values.persistentStorage.requests }}

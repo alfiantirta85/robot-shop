@@ -1,5 +1,7 @@
 apiVersion: apps/v1
-kind: StatefulSetmetadata:  name: mysql
+kind: StatefulSet
+metadata:
+  name: mysql
   namespace: {{ .Values.namespace }}
   labels:
     service: mysql
