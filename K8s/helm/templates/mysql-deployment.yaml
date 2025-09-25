@@ -21,6 +21,9 @@ spec:
       - name: mysql
         image: {{ .Values.image.repo }}/rs-mysql-db:{{ .Values.image.version }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        envFrom:
+        - secretRef:
+            name: mysql-secret
         # added for Istio
         securityContext:
           capabilities:

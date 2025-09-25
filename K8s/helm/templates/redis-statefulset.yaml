@@ -20,13 +20,13 @@ spec:
       {{ end }}
       containers:
       - name: redis
-        image: redis:4.0.6
+        image: alfian8/redis:6.2-alpine
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: 6379
-        volumeMounts:
-          - name: data
-            mountPath: /mnt/redis
+#        volumeMounts:
+#          - name: data
+#            mountPath: /mnt/redis
         resources:
           limits:
             cpu: 200m
@@ -47,16 +47,16 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-  volumeClaimTemplates:
-    - metadata:
-        name: data
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        {{ if not .Values.openshift }}
-        storageClassName: {{ .Values.redis.storageClassName }}
-        volumeMode: Filesystem
-        {{ end }}
-        resources:
-          requests:
-            storage: 1Gi
+#  volumeClaimTemplates:
+#    - metadata:
+#        name: data
+#      spec:
+#        accessModes: [ "ReadWriteOnce" ]
+#        {{ if not .Values.openshift }}
+#        storageClassName: {{ .Values.redis.storageClassName }}
+#        volumeMode: Filesystem
+#        {{ end }}
+#        resources:
+#          requests:
+#            storage: 1Gi
 
