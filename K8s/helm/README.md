@@ -12,6 +12,7 @@ $ helm install --name robot-shop --namespace robot-shop .
 
 ```bash
 $ kubectl create ns robot-shop
+$ kubectl create secret generic mysql-secret --from-env-file=.env -n robot-shop
 $ helm install robot-shop --namespace robot-shop .
 ```
 
